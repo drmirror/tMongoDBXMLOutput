@@ -52,6 +52,10 @@
 		%>
 			class DBObjectUtil_<%=cid%> {
 
+			        private java.text.SimpleDateFormat isoDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+				public DBObjectUtil_<%=cid%>() { isoDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); }
+
                                 private com.mongodb.BasicDBObject toMongo (routines.system.Document doc) {
                                     org.dom4j.Element root = doc.getDocument().getRootElement();
                                     return (com.mongodb.BasicDBObject)valueToMongo(root);
@@ -60,6 +64,26 @@
                                 private Object valueToMongo (org.dom4j.Element e) {
 				    String text = e.getTextTrim();
                                     if (!"".equals(text)) {
+				        String type = e.attributeValue("type");
+					if (type != null) {
+					    type = type.toLowerCase();
+					    if (type.equals("int") || type.equals("integer")) {
+					        return Integer.parseInt(text);
+					    } else if (type.equals("boolean")) {
+					        text = text.toLowerCase();
+					        if ("false".equals(text)) {
+						  return new Boolean(false);
+						} else if ("true".equals(text)) {
+						  return new Boolean(true);
+						} 
+					    } else if (type.equals("date") || type.equals("isodate")) {
+					        try {
+					            return isoDateFormat.parse(text);
+						} catch (ParseException ex) {
+						    throw new RuntimeException(ex);
+                                                }
+					    }
+					}
                                         return text;
                                     } else if (e.element("item") != null) {
                                         com.mongodb.BasicDBList result = new com.mongodb.BasicDBList();
