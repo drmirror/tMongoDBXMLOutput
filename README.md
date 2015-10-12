@@ -33,7 +33,26 @@ JSON and writes it to the database.
 In order to create meaningful JSON, the XML needs to follow a few
 conventions.
 
-(to be continued)
+* Nested XML elements translate naturally to nested JSON documents.
+  The top-level root tag is always ignored.  For example, this XML structure::
+
+    <root>
+      <name>James Bond</name>
+      <address>
+        <city>London</city>
+	<country>UK</country>
+      </address>
+    </root>
+
+  translates to this JSON::
+
+    {
+       "name" : "James Bond",
+       "address" : {
+          "city" : "London",
+	  "country" : "UK"
+       }
+    }
 
 
 
